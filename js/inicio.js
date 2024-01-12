@@ -42,7 +42,6 @@ function generarMensaje(cliente) {
     mostrarMensaje(cliente);
 
 }
-
 var mensaje = "";
 function mostrarMensaje(cliente) {
     var iconoWhatsApp = document.getElementById('iconoWhatsApp');
@@ -101,7 +100,6 @@ btnCopiar.addEventListener('click', function (e) {
     let textArea = document.getElementById('mensaje')
     textArea.innerHTML = ""
 });
-
 document.getElementById('tipoMensaje').addEventListener('change', function (event) {
     var opcionSeleccionada = event.target.value;//obtiene el valor de la opcion seleccionada
     var fechaDiv = document.getElementById('fechaDiv');
