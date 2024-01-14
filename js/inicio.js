@@ -1,16 +1,71 @@
 var mensajeMostrar = document.getElementById('mensajeGenerado');
-var codCliente = document.getElementById('codCliente');
-var telf = document.getElementById('telf');
-var fechaComp = document.getElementById('fechaComp');
-var descrip = document.getElementById('descrip');
-var tipoGestion = document.getElementById('tipoGestion');
-var monto = document.getElementById('monto');
+
+//Lista de clientes
+
+var lista = JSON.parse(localStorage.getItem("listaClientes"));
+if (lista != null) {
+    recorrerLista();
+}
+
+console.log("Lista cliente:" + lista);
+function recorrerLista() {
+
+    //Tabla
+    var miTabla = document.getElementById('miTabla').getElementsByTagName('tbody')[0];
+    while (miTabla.hasChildNodes()) {
+        miTabla.removeChild(miTabla.firstChild);
+    }
+    var lista = JSON.parse(localStorage.getItem("listaClientes"));
+    //Recorremos la lista
+    lista.forEach(element => {
+        //clase padre
+        var tbody = document.getElementById('tBody');
+        //Crear un tr
+        var tr = document.createElement("tr");
+        tr.id = "idTr";
+        //Creando los td para cada atributo
+        var codigoTd = document.createElement('td');
+        var telefonoTd = document.createElement('td');
+        var fechaTd = document.createElement('td');
+        var descripcionTd = document.createElement('td');
+        var tipoGestionTd = document.createElement('td');
+
+        //Agregando el valor a los tds creados
+        codigoTd.innerHTML = element.codigo;
+        telefonoTd.innerHTML = element.telefono;
+        fechaTd.innerHTML = element.fecha;
+        descripcionTd.innerHTML = element.descripcion;
+        if (element.tipoGestion == "TR") {
+            tipoGestionTd.innerHTML = "TR: Seguimiento";
+            tr.style.backgroundColor = "yellow";
+
+        } else if (element.tipoGestion == "UR") {
+            tipoGestionTd.innerHTML = "UR: Promesa Pago";
+            tr.style.backgroundColor = "Lime";
+        } else if (element.tipoGestion == "TU") {
+            tipoGestionTd.innerHTML = "TU: Volver Llamar";
+            tr.style.backgroundColor = "Teal";
+        }
+
+        //Agregando al al tr los elementos
+        tr.appendChild(codigoTd);
+        tr.appendChild(telefonoTd);
+        tr.appendChild(fechaTd);
+        tr.appendChild(descripcionTd);
+        tr.appendChild(tipoGestionTd);
+        
+        //Incluyendo el tr al tbody
+        tbody.appendChild(tr);
+    });
+}
+
+//Formulario
+
 
 document.getElementById('formulario').addEventListener('submit',
     function (event) {
 
         event.preventDefault();//evita que el formulario se envie automaticamente
-
 
         var entidad = document.getElementById('entidad').value;
         var tipoMensaje = document.getElementById('tipoMensaje').value;
@@ -20,6 +75,10 @@ document.getElementById('formulario').addEventListener('submit',
         var monto = document.getElementById('monto').value;
         var tipo = document.getElementById('tipo').value;
         var numero = document.getElementById('numero').value;
+        var codigo = document.getElementById('codigo').value;
+        var descripcion = document.getElementById('descripcion').value;
+        var tipoGestion = document.getElementById('tipoGestion').value;
+
 
         var nombresMayus = nombresCom.toUpperCase();
         var tipoMayus = tipo.toUpperCase();
@@ -32,22 +91,20 @@ document.getElementById('formulario').addEventListener('submit',
             telefono: telefono,
             montoPago: monto,
             tipoProducto: tipoMayus,
-            numeroProducto: numero
+            numeroProducto: numero,
+            codigo: codigo,
+            descripcion: descripcion,
+            tipoGestion: tipoGestion
 
         };
-        generarMensaje(cliente);
+        mostrarMensaje(cliente);
     });
-function generarMensaje(cliente) {
-
-    mostrarMensaje(cliente);
-
-}
 var mensaje = "";
 function mostrarMensaje(cliente) {
     var iconoWhatsApp = document.getElementById('iconoWhatsApp');
     if (cliente.telefono != null) {
         iconoWhatsApp.style.display = "block";
-    } 
+    }
     var linkWhatsapp = document.getElementById('linkWhatsApp');
     var link = 'http://api.whatsapp.com/send?phone=51' + cliente.telefono
     linkWhatsapp.href = link
@@ -85,6 +142,8 @@ function mostrarMensaje(cliente) {
         mensaje = vencida;
         mensajeMostrar.innerHTML = vencida;
     }
+    cargarTabla(cliente);
+    document.getElementById('formulario').reset();
 }
 let btnCopiar = document.getElementById('copiarMensaje');
 btnCopiar.addEventListener('click', function (e) {
@@ -100,12 +159,61 @@ btnCopiar.addEventListener('click', function (e) {
     let textArea = document.getElementById('mensaje')
     textArea.innerHTML = ""
 });
+
+function cargarTabla(cliente) {
+    //Recuperar la lista de objetos
+    var listaClientes = JSON.parse(localStorage.getItem('listaClientes')) || [];
+
+    //Nuevo objeto a agregar
+    var clienteAgendado =
+    {
+        codigo: cliente.codigo,
+        telefono: cliente.telefono,
+        fecha: cliente.fechaPago,
+        descripcion: cliente.descripcion,
+        tipoGestion: cliente.tipoGestion
+    };
+    var objetoYaIngresado = listaClientes.some(function (item) {
+        return item["codigo"] === clienteAgendado.codigo;
+    })
+    if (!objetoYaIngresado) {
+        listaClientes.push(clienteAgendado);
+    }
+    //Guardar la lista actualizada
+    localStorage.setItem('listaClientes', JSON.stringify(listaClientes));
+    recorrerLista();
+
+}
+
+var tipoMensajeDiv = document.getElementById('tipoMensajeDiv');
+var fechaDiv = document.getElementById('fechaDiv');
+var telefonoDiv = document.getElementById('telefonoDiv');
+var tipoProductoDiv = document.getElementById('tipoProductoDiv');
+var numeroProductoDiv = document.getElementById('numeroProductoDiv');
+var clienteDiv = document.getElementById('clienteDiv');
+var montoDiv = document.getElementById('montoDiv');
+
+document.getElementById('tipoGestion').addEventListener('change', function (event) {
+    var seleccionTipoGestion = event.target.value;
+    if (seleccionTipoGestion == "TR" || seleccionTipoGestion == "TU") {
+        tipoMensajeDiv.style.display = "none";
+        tipoProductoDiv.style.display = "none";
+        clienteDiv.style.display = "none";
+        montoDiv.style.display = "none";
+        numeroProductoDiv.style.display = "none";
+
+    } else {
+        tipoMensajeDiv.style.display = "block";
+        tipoProductoDiv.style.display = "block";
+        clienteDiv.style.display = "block";
+        montoDiv.style.display = "block";
+        numeroProductoDiv.style.display = "block";
+    }
+})
+
 document.getElementById('tipoMensaje').addEventListener('change', function (event) {
     var opcionSeleccionada = event.target.value;//obtiene el valor de la opcion seleccionada
-    var fechaDiv = document.getElementById('fechaDiv');
-    var telefonoDiv = document.getElementById('telefonoDiv');
-    var tipoProductoDiv = document.getElementById('tipoProductoDiv');
-    var numeroProductoDiv = document.getElementById('numeroProductoDiv');
+
 
     if (opcionSeleccionada == 'recordatorio') {
         fechaDiv.style.display = 'block';
@@ -114,9 +222,8 @@ document.getElementById('tipoMensaje').addEventListener('change', function (even
 
     } else if (opcionSeleccionada == "campaña") {
         fechaDiv.style.display = 'block';
-        numeroProductoDiv.style.display = "none";
         telefonoDiv.style.display = 'block';
-        tipoProductoDiv.style.display = "none";
+        numeroProductoDiv.style.display = 'none';
     } else if (opcionSeleccionada == "vencida") {
         fechaDiv.style.display = 'none';
         numeroProductoDiv.style.display = "none";
