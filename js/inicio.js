@@ -53,7 +53,7 @@ function recorrerLista() {
         tr.appendChild(fechaTd);
         tr.appendChild(descripcionTd);
         tr.appendChild(tipoGestionTd);
-        
+
         //Incluyendo el tr al tbody
         tbody.appendChild(tr);
     });
@@ -61,6 +61,10 @@ function recorrerLista() {
 
 //Formulario
 
+document.getElementById('btnMensajes').addEventListener('click', function () {
+
+    alert("Mensajes");
+})
 
 document.getElementById('formulario').addEventListener('submit',
     function (event) {
@@ -126,6 +130,9 @@ function mostrarMensaje(cliente) {
 
     var campaña = cliente.nombres + ', *' + cliente.entidad + '*, tiene un Dscto Especial *PRE_APROBADO*, cancela tu Producto *' + cliente.tipoProducto + '* con *S/.' +
         cliente.montoPago + '* , Previa evaluación, \n\n*ACTIVALO* comunicándote por este medio.\n\nTramite su *CONSTANCIA DE NO ADEUDO* y Evite seguir manteniendo un reporte negativo en las centrales de riesgo.\n\nDscto válido hasta: *' + cliente.fechaPago + '*'
+
+    var solucion = "*Banco BBVA*, estimado(a) *" + cliente.nombres + "* confiamos en que se encuentre bien.Nos comunicamos respecto a la *deuda pendiente* que mantiene con el *Banco BBVA*. Valoramos su compromiso y estamos dispuestos a trabajar juntos para encontrar una solución mutuamente beneficiosa. \n\nEs importante mencionar que, de no recibir respuesta en un plazo razonable, nos veremos en la obligación de evaluar *medidas legales disponibles* para recuperar la deuda en su totalidad. Preferimos evitar este camino y llegar a un *acuerdo amigable* .\n\nLa resolución de esta deuda contribuirá a mejorar su *historial crediticio* y *acceso a futuros créditos*, por lo mismo le instamos a ponerse en contacto a la brevedad posible para discutir opciones de pago y resolver esta situación de manera efectiva.\n\n *Agradecemos su atención y cooperación*.";
+    var relampago = "*Banco BBVA* tiene un descuento especial *pre aprobado*, cancela tu producto comunicándote por este medio.\n\nTramite su *constancia de no adeudo* y evite seguir manteniendo un reporte negativo en las centrales de riesgo.\n\nDescuento válido solo por 24 horas.";
     if (cliente.tipoMensaje == "promesa1") {
         mensaje = promesaVentanilla;
         mensajeMostrar.innerHTML = promesaVentanilla;
@@ -141,8 +148,17 @@ function mostrarMensaje(cliente) {
     } else if (cliente.tipoMensaje == "vencida") {
         mensaje = vencida;
         mensajeMostrar.innerHTML = vencida;
+    } else if (cliente.tipoMensaje == "solucion") {
+        mensaje = solucion;
+        mensajeMostrar.innerHTML = solucion;
+    } else if (cliente.tipoMensaje == "relampago") {
+        mensaje = relampago;
+        mensajeMostrar.innerHTML = relampago;
     }
-    cargarTabla(cliente);
+    if(cliente.tipoGestion !=""){
+        cargarTabla(cliente);
+    }
+    
     document.getElementById('formulario').reset();
 }
 let btnCopiar = document.getElementById('copiarMensaje');
@@ -192,6 +208,9 @@ var tipoProductoDiv = document.getElementById('tipoProductoDiv');
 var numeroProductoDiv = document.getElementById('numeroProductoDiv');
 var clienteDiv = document.getElementById('clienteDiv');
 var montoDiv = document.getElementById('montoDiv');
+var tipoGestionDiv = document.getElementById("tipoGestionDiv");
+var codigoDiv= document.getElementById('codigoDiv');
+var descripcionDiv = document.getElementById('descripcionDiv');
 
 document.getElementById('tipoGestion').addEventListener('change', function (event) {
     var seleccionTipoGestion = event.target.value;
@@ -229,10 +248,33 @@ document.getElementById('tipoMensaje').addEventListener('change', function (even
         numeroProductoDiv.style.display = "none";
         telefonoDiv.style.display = 'block';
         tipoProductoDiv.style.display = "none";
-    } else {
+    } else if (opcionSeleccionada == "solucion") {
+        tipoGestionDiv.style.display = "none";
+        montoDiv.style.display="none";
+        codigoDiv.style.display="none";
+        tipoProductoDiv.style.display="none";
+        numeroProductoDiv.style.display="none";
+        fechaDiv.style.display="none";
+        descripcionDiv.style.display="none";
+
+    } else if (opcionSeleccionada == "relampago") {
+        tipoGestionDiv.style.display = "none";
+        montoDiv.style.display="none";
+        codigoDiv.style.display="none";
+        tipoProductoDiv.style.display="none";
+        numeroProductoDiv.style.display="none";
+        fechaDiv.style.display="none";
+        descripcionDiv.style.display="none";
+        clienteDiv.style.display="none";
+        
+    }else {
         fechaDiv.style.display = 'block';
         telefonoDiv.style.display = 'block';
         tipoProductoDiv.style.display = 'block';
         numeroProductoDiv.style.display = 'block';
+        tipoGestionDiv.style.display="block";
+        codigoDiv.style.display="block";
+        descripcionDiv.style.display="block";
+        clienteDiv.style.display="block";
     }
 })
